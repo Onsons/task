@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -43,18 +45,21 @@ public class MessageContrroller {
     }
     //View the Latest messages that not older than ageMax minutes
     @GetMapping("messages/filter")
-    public List<Message>getMessagesByAge(@RequestParam  int age) {
-        return messageRepository.getMessagesByAge(age);
+    public  List<Message> getMessagesByAge(@RequestParam  int age)
+    {
+
+            return messageRepository.getMessagesByAge(age);
+
     }
 
 
 
     //Scheduled Job that deletes entries after 120 minutes
-    @Scheduled(fixedDelay = 60)
+    @Transactional
+    @Scheduled(fixedRate = 2000, initialDelay = 5000)
     public void delete() {
-        List<Message> list = messageRepository.getMessagesByAge(120);
-        for (Message l:list) {
-            messageRepository.deleteById(l.getId());
-        }
+       // System.out.println("ok ok ok ");
+       messageRepository.deleteScheduledMessage();
+
     }
 }
